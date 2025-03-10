@@ -139,34 +139,6 @@ void TebConfig::loadRosParamFromNodeHandle(const ros::NodeHandle& nh)
   nh.param("weight_adapt_factor", optim.weight_adapt_factor, optim.weight_adapt_factor);
   nh.param("obstacle_cost_exponent", optim.obstacle_cost_exponent, optim.obstacle_cost_exponent);
   
-  // Homotopy Class Planner
-  nh.param("enable_homotopy_class_planning", hcp.enable_homotopy_class_planning, hcp.enable_homotopy_class_planning); 
-  nh.param("enable_multithreading", hcp.enable_multithreading, hcp.enable_multithreading); 
-  nh.param("simple_exploration", hcp.simple_exploration, hcp.simple_exploration); 
-  nh.param("max_number_classes", hcp.max_number_classes, hcp.max_number_classes);
-  nh.param("max_number_plans_in_current_class", hcp.max_number_plans_in_current_class, hcp.max_number_plans_in_current_class);
-  nh.param("selection_obst_cost_scale", hcp.selection_obst_cost_scale, hcp.selection_obst_cost_scale);
-  nh.param("selection_prefer_initial_plan", hcp.selection_prefer_initial_plan, hcp.selection_prefer_initial_plan);
-  nh.param("selection_viapoint_cost_scale", hcp.selection_viapoint_cost_scale, hcp.selection_viapoint_cost_scale);
-  nh.param("selection_cost_hysteresis", hcp.selection_cost_hysteresis, hcp.selection_cost_hysteresis); 
-  nh.param("selection_alternative_time_cost", hcp.selection_alternative_time_cost, hcp.selection_alternative_time_cost); 
-  nh.param("selection_dropping_probability", hcp.selection_dropping_probability, hcp.selection_dropping_probability); 
-  nh.param("switching_blocking_period", hcp.switching_blocking_period, hcp.switching_blocking_period);
-  nh.param("roadmap_graph_samples", hcp.roadmap_graph_no_samples, hcp.roadmap_graph_no_samples); 
-  nh.param("roadmap_graph_area_width", hcp.roadmap_graph_area_width, hcp.roadmap_graph_area_width); 
-  nh.param("roadmap_graph_area_length_scale", hcp.roadmap_graph_area_length_scale, hcp.roadmap_graph_area_length_scale);
-  nh.param("h_signature_prescaler", hcp.h_signature_prescaler, hcp.h_signature_prescaler); 
-  nh.param("h_signature_threshold", hcp.h_signature_threshold, hcp.h_signature_threshold); 
-  nh.param("obstacle_keypoint_offset", hcp.obstacle_keypoint_offset, hcp.obstacle_keypoint_offset); 
-  nh.param("obstacle_heading_threshold", hcp.obstacle_heading_threshold, hcp.obstacle_heading_threshold); 
-  nh.param("viapoints_all_candidates", hcp.viapoints_all_candidates, hcp.viapoints_all_candidates);
-  nh.param("visualize_hc_graph", hcp.visualize_hc_graph, hcp.visualize_hc_graph); 
-  nh.param("visualize_with_time_as_z_axis_scale", hcp.visualize_with_time_as_z_axis_scale, hcp.visualize_with_time_as_z_axis_scale);
-  nh.param("delete_detours_backwards", hcp.delete_detours_backwards, hcp.delete_detours_backwards);
-  nh.param("detours_orientation_tolerance", hcp.detours_orientation_tolerance, hcp.detours_orientation_tolerance);
-  nh.param("length_start_orientation_vector", hcp.length_start_orientation_vector, hcp.length_start_orientation_vector);
-  nh.param("max_ratio_detours_duration_best_duration", hcp.max_ratio_detours_duration_best_duration, hcp.max_ratio_detours_duration_best_duration);
-  
   // Recovery
   nh.param("shrink_horizon_backup", recovery.shrink_horizon_backup, recovery.shrink_horizon_backup);
   nh.param("shrink_horizon_min_duration", recovery.shrink_horizon_min_duration, recovery.shrink_horizon_min_duration);
@@ -271,28 +243,6 @@ void TebConfig::reconfigure(TebLocalPlannerReconfigureConfig& cfg)
   optim.weight_adapt_factor = cfg.weight_adapt_factor;
   optim.obstacle_cost_exponent = cfg.obstacle_cost_exponent;
   
-  // Homotopy Class Planner
-  hcp.enable_multithreading = cfg.enable_multithreading;
-  hcp.max_number_classes = cfg.max_number_classes; 
-  hcp.max_number_plans_in_current_class = cfg.max_number_plans_in_current_class;
-  hcp.selection_cost_hysteresis = cfg.selection_cost_hysteresis;
-  hcp.selection_prefer_initial_plan = cfg.selection_prefer_initial_plan;
-  hcp.selection_obst_cost_scale = cfg.selection_obst_cost_scale;
-  hcp.selection_viapoint_cost_scale = cfg.selection_viapoint_cost_scale;
-  hcp.selection_alternative_time_cost = cfg.selection_alternative_time_cost;
-  hcp.selection_dropping_probability = cfg.selection_dropping_probability;
-  hcp.switching_blocking_period = cfg.switching_blocking_period;
-  
-  hcp.obstacle_heading_threshold = cfg.obstacle_heading_threshold;
-  hcp.roadmap_graph_no_samples = cfg.roadmap_graph_no_samples;
-  hcp.roadmap_graph_area_width = cfg.roadmap_graph_area_width;
-  hcp.roadmap_graph_area_length_scale = cfg.roadmap_graph_area_length_scale;
-  hcp.h_signature_prescaler = cfg.h_signature_prescaler;
-  hcp.h_signature_threshold = cfg.h_signature_threshold;
-  hcp.viapoints_all_candidates = cfg.viapoints_all_candidates;
-  hcp.visualize_hc_graph = cfg.visualize_hc_graph;
-  hcp.visualize_with_time_as_z_axis_scale = cfg.visualize_with_time_as_z_axis_scale;
-  
   // Recovery
   recovery.shrink_horizon_backup = cfg.shrink_horizon_backup;
   recovery.oscillation_recovery = cfg.oscillation_recovery;
@@ -338,10 +288,6 @@ void TebConfig::checkParameters() const
   if (obstacles.costmap_obstacles_behind_robot_dist < 0)
     ROS_WARN("TebLocalPlannerROS() Param Warning: parameter 'costmap_obstacles_behind_robot_dist' should be positive or zero.");
     
-  // hcp: obstacle heading threshold
-  if (hcp.obstacle_keypoint_offset>=1 || hcp.obstacle_keypoint_offset<=0)
-    ROS_WARN("TebLocalPlannerROS() Param Warning: parameter obstacle_heading_threshold must be in the interval ]0,1[. 0=0deg opening angle, 1=90deg opening angle.");
-  
   // carlike
   if (robot.cmd_angle_instead_rotvel && robot.wheelbase==0)
     ROS_WARN("TebLocalPlannerROS() Param Warning: parameter cmd_angle_instead_rotvel is non-zero but wheelbase is set to zero: undesired behavior.");

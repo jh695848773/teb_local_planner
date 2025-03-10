@@ -110,19 +110,11 @@ void TebLocalPlannerROS::initialize(std::string name, tf2_ros::Buffer* tf, costm
         
     // create robot footprint/contour model for optimization
     cfg_.robot_model = getRobotFootprintFromParamServer(nh, cfg_);
-    
+
     // create the planner instance
-    if (cfg_.hcp.enable_homotopy_class_planning)
-    {
-      planner_ = PlannerInterfacePtr(new HomotopyClassPlanner(cfg_, &obstacles_, visualization_, &via_points_));
-      ROS_INFO("Parallel planning in distinctive topologies enabled.");
-    }
-    else
-    {
-      planner_ = PlannerInterfacePtr(new TebOptimalPlanner(cfg_, &obstacles_, visualization_, &via_points_));
-      ROS_INFO("Parallel planning in distinctive topologies disabled.");
-    }
-    
+    planner_ = PlannerInterfacePtr(new TebOptimalPlanner(cfg_, &obstacles_, visualization_, &via_points_));
+    ROS_INFO("Parallel planning in distinctive topologies disabled.");
+
     // init other variables
     tf_ = tf;
     costmap_ros_ = costmap_ros;
@@ -455,7 +447,6 @@ uint32_t TebLocalPlannerROS::computeVelocityCommands(const geometry_msgs::PoseSt
   
   // Now visualize everything    
   planner_->visualize();
-  visualization_->publishObstacles(obstacles_, costmap_->getResolution());
   visualization_->publishViaPoints(via_points_);
   visualization_->publishGlobalPlan(global_plan_);
   return mbf_msgs::ExePathResult::SUCCESS;

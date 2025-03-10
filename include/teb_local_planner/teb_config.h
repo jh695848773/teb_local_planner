@@ -179,41 +179,6 @@ public:
     double obstacle_cost_exponent; //!< Exponent for nonlinear obstacle cost (cost = linear_cost * obstacle_cost_exponent). Set to 1 to disable nonlinear cost (default)
   } optim; //!< Optimization related parameters
 
-
-  struct HomotopyClasses
-  {
-    bool enable_homotopy_class_planning; //!< Activate homotopy class planning (Requires much more resources that simple planning, since multiple trajectories are optimized at once).
-    bool enable_multithreading; //!< Activate multiple threading for planning multiple trajectories in parallel.
-    bool simple_exploration; //!< If true, distinctive trajectories are explored using a simple left-right approach (pass each obstacle on the left or right side) for path generation, otherwise sample possible roadmaps randomly in a specified region between start and goal.
-    int max_number_classes; //!< Specify the maximum number of allowed alternative homotopy classes (limits computational effort)
-    int max_number_plans_in_current_class; //!< Specify the maximum number of trajectories to try that are in the same homotopy class as the current trajectory (helps avoid local minima)
-    double selection_cost_hysteresis; //!< Specify how much trajectory cost must a new candidate have w.r.t. a previously selected trajectory in order to be selected (selection if new_cost < old_cost*factor).
-    double selection_prefer_initial_plan; //!< Specify a cost reduction in the interval (0,1) for the trajectory in the equivalence class of the initial plan.
-    double selection_obst_cost_scale; //!< Extra scaling of obstacle cost terms just for selecting the 'best' candidate.
-    double selection_viapoint_cost_scale; //!< Extra scaling of via-point cost terms just for selecting the 'best' candidate.
-    bool selection_alternative_time_cost; //!< If true, time cost is replaced by the total transition time.
-    double selection_dropping_probability; //!< At each planning cycle, TEBs other than the current 'best' one will be randomly dropped with this probability. Prevents becoming 'fixated' on sub-optimal alternative homotopies.
-    double switching_blocking_period; //!< Specify a time duration in seconds that needs to be expired before a switch to new equivalence class is allowed
-
-    int roadmap_graph_no_samples; //! < Specify the number of samples generated for creating the roadmap graph, if simple_exploration is turend off.
-    double roadmap_graph_area_width; //!< Random keypoints/waypoints are sampled in a rectangular region between start and goal. Specify the width of that region in meters.
-    double roadmap_graph_area_length_scale; //!< The length of the rectangular region is determined by the distance between start and goal. This parameter further scales the distance such that the geometric center remains equal!
-    double h_signature_prescaler; //!< Scale number of obstacle value in order to allow huge number of obstacles. Do not choose it extremly low, otherwise obstacles cannot be distinguished from each other (0.2<H<=1).
-    double h_signature_threshold; //!< Two h-signatures are assumed to be equal, if both the difference of real parts and complex parts are below the specified threshold.
-
-    double obstacle_keypoint_offset; //!< If simple_exploration is turned on, this parameter determines the distance on the left and right side of the obstacle at which a new keypoint will be cretead (in addition to min_obstacle_dist).
-    double obstacle_heading_threshold; //!< Specify the value of the normalized scalar product between obstacle heading and goal heading in order to take them (obstacles) into account for exploration [0,1]
-
-    bool viapoints_all_candidates; //!< If true, all trajectories of different topologies are attached to the current set of via-points, otherwise only the trajectory sharing the same one as the initial/global plan.
-
-    bool visualize_hc_graph; //!< Visualize the graph that is created for exploring new homotopy classes.
-    double visualize_with_time_as_z_axis_scale; //!< If this value is bigger than 0, the trajectory and obstacles are visualized in 3d using the time as the z-axis scaled by this value. Most useful for dynamic obstacles.
-    bool delete_detours_backwards; //!< If enabled, the planner will discard the plans detouring backwards with respect to the best plan
-    double detours_orientation_tolerance; //!< A plan is considered a detour if its start orientation differs more than this from the best plan
-    double length_start_orientation_vector; //!< Length of the vector used to compute the start orientation of a plan
-    double max_ratio_detours_duration_best_duration; //!< Detours are discarted if their execution time / the execution time of the best teb is > this
-  } hcp;
-
   //! Recovery/backup related parameters
   struct Recovery
   {
@@ -250,7 +215,6 @@ public:
     robot_model = boost::make_shared<PointRobotFootprint>();
 
     // Trajectory
-
     trajectory.teb_autosize = true;
     trajectory.dt_ref = 0.3;
     trajectory.dt_hysteresis = 0.1;
@@ -273,7 +237,6 @@ public:
     trajectory.prevent_look_ahead_poses_near_goal = 0;
 
     // Robot
-
     robot.max_vel_x = 0.4;
     robot.max_vel_x_backwards = 0.2;
     robot.max_vel_y = 0.0;
@@ -289,7 +252,6 @@ public:
     robot.use_proportional_saturation = false;
 
     // GoalTolerance
-
     goal_tolerance.xy_goal_tolerance = 0.2;
     goal_tolerance.yaw_goal_tolerance = 0.2;
     goal_tolerance.free_goal_vel = false;
@@ -298,7 +260,6 @@ public:
     goal_tolerance.complete_global_plan = true;
 
     // Obstacles
-
     obstacles.min_obstacle_dist = 0.5;
     obstacles.inflation_dist = 0.6;
     obstacles.dynamic_obstacle_inflation_dist = 0.6;
@@ -317,7 +278,6 @@ public:
     obstacles.obstacle_proximity_upper_bound = 0.5;
 
     // Optimization
-
     optim.no_inner_iterations = 5;
     optim.no_outer_iterations = 4;
     optim.optimization_activate = true;
@@ -345,39 +305,7 @@ public:
     optim.weight_adapt_factor = 2.0;
     optim.obstacle_cost_exponent = 1.0;
 
-    // Homotopy Class Planner
-
-    hcp.enable_homotopy_class_planning = true;
-    hcp.enable_multithreading = true;
-    hcp.simple_exploration = false;
-    hcp.max_number_classes = 5;
-    hcp.selection_cost_hysteresis = 1.0;
-    hcp.selection_prefer_initial_plan = 0.95;
-    hcp.selection_obst_cost_scale = 100.0;
-    hcp.selection_viapoint_cost_scale = 1.0;
-    hcp.selection_alternative_time_cost = false;
-    hcp.selection_dropping_probability = 0.0;
-
-    hcp.obstacle_keypoint_offset = 0.1;
-    hcp.obstacle_heading_threshold = 0.45;
-    hcp.roadmap_graph_no_samples = 15;
-    hcp.roadmap_graph_area_width = 6; // [m]
-    hcp.roadmap_graph_area_length_scale = 1.0;
-    hcp.h_signature_prescaler = 1;
-    hcp.h_signature_threshold = 0.1;
-    hcp.switching_blocking_period = 0.0;
-
-    hcp.viapoints_all_candidates = true;
-
-    hcp.visualize_hc_graph = false;
-    hcp.visualize_with_time_as_z_axis_scale = 0.0;
-    hcp.delete_detours_backwards = true;
-    hcp.detours_orientation_tolerance = M_PI / 2.0;
-    hcp.length_start_orientation_vector = 0.4;
-    hcp.max_ratio_detours_duration_best_duration = 3.0;
-
     // Recovery
-
     recovery.shrink_horizon_backup = true;
     recovery.shrink_horizon_min_duration = 10;
     recovery.oscillation_recovery = true;
@@ -385,8 +313,6 @@ public:
     recovery.oscillation_omega_eps = 0.1;
     recovery.oscillation_recovery_min_duration = 10;
     recovery.oscillation_filter_duration = 10;
-
-
   }
 
   /**

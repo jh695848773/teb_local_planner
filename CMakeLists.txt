@@ -188,9 +188,7 @@ add_library(teb_local_planner
    src/visualization.cpp
    src/recovery_behaviors.cpp
    src/teb_config.cpp
-   src/homotopy_class_planner.cpp
    src/teb_local_planner_ros.cpp
-   src/graph_search.cpp
 )
 
 # Dynamic reconfigure: make sure configure headers are built before any node using them

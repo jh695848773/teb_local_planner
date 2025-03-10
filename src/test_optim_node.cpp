@@ -150,12 +150,8 @@ int main( int argc, char** argv )
   config.robot_model = TebLocalPlannerROS::getRobotFootprintFromParamServer(n, config);
   
   // Setup planner (homotopy class planning or just the local teb planner)
-  if (config.hcp.enable_homotopy_class_planning)
-    planner = PlannerInterfacePtr(new HomotopyClassPlanner(config, &obst_vector, visual, &via_points));
-  else
-    planner = PlannerInterfacePtr(new TebOptimalPlanner(config, &obst_vector, visual, &via_points));
+  planner = PlannerInterfacePtr(new TebOptimalPlanner(config, &obst_vector, visual, &via_points));
   
-
   no_fixed_obstacles = obst_vector.size();
   ros::spin();
 
@@ -172,7 +168,6 @@ void CB_mainCycle(const ros::TimerEvent& e)
 void CB_publishCycle(const ros::TimerEvent& e)
 {
   planner->visualize();
-  visual->publishObstacles(obst_vector);
   visual->publishViaPoints(via_points);
 }
 

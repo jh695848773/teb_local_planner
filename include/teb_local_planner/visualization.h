@@ -153,65 +153,10 @@ public:
                                   const std::vector<geometry_msgs::Point>& footprint);
 
   /**
-   * @brief Publish obstacle positions to the ros topic \e ../../teb_markers
-   * @todo Move filling of the marker message to polygon class in order to avoid checking types.
-   * @param obstacles Obstacle container
-   * @param scale Size of the non-circular obstacles
-   */
-  void publishObstacles(const ObstContainer& obstacles, double scale = 0.1) const;
-
-  /**
    * @brief Publish via-points to the ros topic \e ../../teb_markers
    * @param via_points via-point container
    */
   void publishViaPoints(const std::vector< Eigen::Vector2d, Eigen::aligned_allocator<Eigen::Vector2d> >& via_points, const std::string& ns = "ViaPoints") const;
-  
-  /**
-   * @brief Publish a boost::adjacency_list (boost's graph datatype) via markers.
-   * @remarks Make sure that vertices of the graph contain a member \c pos as \c Eigen::Vector2d type
-   *	      to query metric position values.
-   * @param graph Const reference to the boost::adjacency_list (graph)
-   * @param ns_prefix Namespace prefix for the marker objects (the strings "Edges" and "Vertices" will be appended)
-   * @tparam GraphType boost::graph object in which vertices has the field/member \c pos.
-   */
-  template <typename GraphType>
-  void publishGraph(const GraphType& graph, const std::string& ns_prefix = "Graph");
-  
-  /**
-   * @brief Publish multiple 2D paths (each path given as a point sequence) from a container class.
-   * 
-   * Provide a std::vector< std::vector< T > > in which T.x() and T.y() exist
-   * and std::vector could be individually substituded by std::list / std::deque /...
-   * 
-   * A common point-type for object T could be Eigen::Vector2d.
-   * 
-   * T could be also a raw pointer std::vector< std::vector< T* > >.
-   * 
-   * @code
-   * 	typedef std::vector<Eigen::Vector2d, Eigen::aligned_allocator<Eigen::Vector2d> > PathType; // could be a list or deque as well ...
-   *    std::vector<PathType> path_container(2); // init 2 empty paths; the container could be a list or deque as well ...
-   * 	// Fill path_container.at(0) with Eigen::Vector2d elements, we skip that here
-   * 	// Fill path_container.at(1) with Eigen::Vector2d elements, we skip that here
-   *    publishPathContainer( path_container.begin(), path_container.end() );
-   * @endcode
-   * 
-   * @remarks Actually the underlying path does not necessarily need to be a Eigen::Vector2d sequence. 
-   *          Eigen::Vector2d can be replaced with any datatype that implement public x() and y() methods.\n
-   * @param first Bidirectional iterator pointing to the begin of the path
-   * @param last Bidirectional iterator pointing to the end of the path
-   * @param ns Namespace for the marker objects (the strings "Edges" and "Vertices" will be appended)
-   * @tparam BidirIter Bidirectional iterator to a 2D path (sequence of Eigen::Vector2d elements) in a container
-   */
-  template <typename BidirIter>
-  void publishPathContainer(BidirIter first, BidirIter last, const std::string& ns = "PathContainer");
-  
-  /**
-   * @brief Publish multiple Tebs from a container class (publish as marker message).
-   * 
-   * @param teb_planner Container of boost::shared_ptr< TebOptPlannerPtr >
-   * @param ns Namespace for the marker objects
-   */
-  void publishTebContainer(const std::vector< boost::shared_ptr<TebOptimalPlanner> >& teb_planner, const std::string& ns = "TebContainer");
     
   /**
    * @brief Publish a feedback message (multiple trajectory version)
@@ -279,9 +224,5 @@ typedef boost::shared_ptr<const TebVisualization> TebVisualizationConstPtr;
 
 
 } // namespace teb_local_planner
-
-
-// Include template method implementations / definitions
-#include <teb_local_planner/visualization.hpp>
 
 #endif /* VISUALIZATION_H_ */
